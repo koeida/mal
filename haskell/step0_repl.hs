@@ -1,28 +1,23 @@
-import System.IO (hFlush, stdout)
+import System.IO
 
-import Readline (readline, load_history)
+cmdEval :: String -> String
+cmdEval = id
 
--- read
-mal_read str = str
+cmdPrint :: String -> IO ()
+cmdPrint = putStrLn
 
--- eval
-eval ast env = ast
+cmdRead :: IO String
+cmdRead = do
+    putStr "user> "
+    hFlush stdout
+    inp <- getLine
+    return inp
 
--- print
-mal_print exp = exp
+rep :: IO ()
+rep = do
+    inp <- cmdRead
+    cmdPrint $ cmdEval inp
+    rep
 
--- repl
-rep line = mal_print $ eval (mal_read line) ""
-
-repl_loop = do
-    line <- readline "user> "
-    case line of
-        Nothing -> return ()
-        Just "" -> repl_loop
-        Just str -> do
-            putStrLn $ rep str
-            repl_loop
-
-main = do
-    load_history
-    repl_loop
+main :: IO ()
+main = rep
